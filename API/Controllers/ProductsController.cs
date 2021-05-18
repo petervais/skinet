@@ -13,17 +13,23 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        private readonly IProductRepository productRepository;
+        private readonly IGenericRepository<Product> productRepository;
+        private readonly IGenericRepository<ProductBrand> productBrandRepository;
+        private readonly IGenericRepository<ProductType> productTypeRepository;
 
-        public ProductsController(IProductRepository productRepository)
+        public ProductsController(IGenericRepository<Product> productRepository,
+            IGenericRepository<ProductBrand> productBrandRepository,
+            IGenericRepository<ProductType> productTypeRepository)
         {
             this.productRepository = productRepository;
+            this.productBrandRepository = productBrandRepository;
+            this.productTypeRepository = productTypeRepository;
         }
 
         [HttpGet]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            var products = await productRepository.GetProductsAsync();
+            var products = await productRepository.ListAllAsync();
 
             return Ok(products);
         }
@@ -31,19 +37,19 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<Product> GetProduct(int id)
         {
-            return await productRepository.GetProductByIdAsync(id);
+            return await productRepository.GetByIdAsync(id);
         }
 
         [HttpGet("brands")]
         public async Task<ActionResult<IReadOnlyList<ProductBrand>>> GetProductBrands()
         {
-            return Ok(await productRepository.GetProductBrandsAsync());
+            return Ok(await productBrandRepository.ListAllAsync());
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<ProductType>>> GetProductTypes()
         {
-            return Ok(await productRepository.GetProductTypesAsync());
+            return Ok(await productTypeRepository.ListAllAsync());
         }
     }
 }
